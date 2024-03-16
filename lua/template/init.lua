@@ -47,6 +47,7 @@ local function expand_expr()
     '{{_upper_file_}}',
     '{{_lua:(.-)_}}',
     '{{_tomorrow_}}',
+    '{{_namespace_}}'
   }
 
   local function expand_recursively(line, expr, replacement)
@@ -54,6 +55,15 @@ local function expand_expr()
       line = line:gsub(expr, replacement, 1)
     end
     return line
+  end
+
+  local function get_project_file(directory)
+    local file = ""
+    while file == "" do
+        --can use glob to find the file
+        file = fn.glob("../../*.csproj")
+    end
+        --once file is found we can use vim.fn.fnamemodify(file, ":p") to get the root of the csproj file
   end
 
   local expr_map = {
@@ -99,6 +109,10 @@ local function expand_expr()
       local next = os.date('%c', os.time(t))
       return expand_recursively(line, expr[9], next)
     end,
+    [expr[10]] = function(line)
+        local file_name = fn.expand('%:p:h')
+        
+    end
   }
 
   return function(line)
