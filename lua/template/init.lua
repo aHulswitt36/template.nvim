@@ -59,6 +59,7 @@ local function expand_expr()
 
   local function get_project_file()
     local file = ""
+    local numberUp = 0
     local pattern = "*.csproj"
     while file == "" do
         --can use glob to find the file
@@ -67,9 +68,10 @@ local function expand_expr()
             break
         end
         pattern = "../" .. pattern
+        numberUp = numberUp + 1
     end
         --once file is found we can use vim.fn.fnamemodify(file, ":p") to get the root of the csproj file
-        return fn.fnamemodify(file, ":p")
+        return numberUp, fn.fnamemodify(file, ":p")
   end
 
   local function split_string(input)
@@ -81,11 +83,11 @@ local function expand_expr()
   end
 
     local function calculateFullNamespace(file_name)
-        local project_file = get_project_file()
+        local numberUp, project_file = get_project_file()
         local split_file_name = split_string(file_name)
         local split_project = split_string(project_file)
         local namespace = ""
-        for i = #split_project, #split_file_name, 1 do
+        for i = #split_project - 1, #split_file_name, 1 do
             namespace = namespace .. "." .. split_file_name[i]
         end
 
