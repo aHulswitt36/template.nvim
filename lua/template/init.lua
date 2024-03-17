@@ -57,7 +57,7 @@ local function expand_expr()
     return line
   end
 
-  local function get_project_file(directory)
+  local function get_project_file()
     local file = ""
     local pattern = "*.csproj"
     while file == "" do
@@ -81,7 +81,7 @@ local function expand_expr()
   end
 
     local function calculateFullNamespace(file_name)
-        local project_file = get_project_file(file_name)
+        local project_file = get_project_file()
         local split_file_name = split_string(file_name)
         local split_project = split_string(project_file)
         local namespace = ""
@@ -136,7 +136,7 @@ local function expand_expr()
       return expand_recursively(line, expr[9], next)
     end,
     [expr[10]] = function(line)
-      local file_path = fn.expand('%:p:h')
+      local file_path = fn.expand('%:t:r')
       local namespace = calculateFullNamespace(file_path)
       return expand_recursively(line, expr[10], namespace)
     end
