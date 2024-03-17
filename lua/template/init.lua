@@ -136,7 +136,8 @@ local function expand_expr()
       return expand_recursively(line, expr[9], next)
     end,
     [expr[10]] = function(line)
-      local namespace = calculateFullNamespace(fn:expand('%:p:h'))
+      local file_path = fn.expand('%:p:h')
+      local namespace = calculateFullNamespace(file_path)
       return expand_recursively(line, expr[10], namespace)
     end
   }
