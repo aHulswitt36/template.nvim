@@ -59,12 +59,38 @@ local function expand_expr()
 
   local function get_project_file(directory)
     local file = ""
+    local pattern = "*.csproj"
     while file == "" do
         --can use glob to find the file
-        file = fn.glob("../../*.csproj")
+        file = fn.glob(pattern)
+        if(file ~= "") then
+            break
+        end
+        pattern = "../" .. pattern
     end
         --once file is found we can use vim.fn.fnamemodify(file, ":p") to get the root of the csproj file
+        return fn.fnamemodify(file, ":p")
   end
+
+  local function split_string(input)
+    local t = {}
+    for i in input.gmatch("[^/]+") do
+        table.insert(t, i)
+    end
+    return t
+  end
+
+    local function calculateFullNamespace(file_name)
+        local project_file = get_project_file(file_name)
+        local split_file_name = split_string(file_name)
+        local split_project = split_string(project_file)
+        local namespace = ""
+        for i = #split_project, #split_file_name, 1 do
+            namespace = namespace .. "." .. split_file_name[i]
+        end
+
+        return string.sub(namespace, 2)
+    end
 
   local expr_map = {
     [expr[1]] = function(line)
@@ -110,8 +136,8 @@ local function expand_expr()
       return expand_recursively(line, expr[9], next)
     end,
     [expr[10]] = function(line)
-        local file_name = fn.expand('%:p:h')
-        
+      local namespace = calculateFullNamespace(fn:expand('%:p:h'))
+      return expand_recursively(line, expr[10], namespace)
     end
   }
 
@@ -131,6 +157,7 @@ local function expand_expr()
   end
 end
 
+ 
 --@private
 local function create_and_load(file)
   local current_path = fn.getcwd()
