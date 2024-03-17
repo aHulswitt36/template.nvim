@@ -74,7 +74,7 @@ local function expand_expr()
 
   local function split_string(input)
     local t = {}
-    for i in input.gmatch("[^/]+") do
+    for i in string.gmatch(input, "[^/]+") do
         table.insert(t, i)
     end
     return t
